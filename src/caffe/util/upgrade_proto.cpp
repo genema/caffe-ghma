@@ -561,9 +561,9 @@ V1LayerParameter_LayerType UpgradeV0LayerType(const string& type) {
     return V1LayerParameter_LayerType_DATA;
   } else if (type == "dropout") {
     return V1LayerParameter_LayerType_DROPOUT;
-  } else if (type == "clarity_loss"){
+  } /*else if (type == "clarity_loss"){
     return V1LayerParameter_LayerType_CLARITY_LOSS;
-  } else if (type == "euclidean_loss") {
+  }*/else if (type == "euclidean_loss") {
     return V1LayerParameter_LayerType_EUCLIDEAN_LOSS;
   } else if (type == "flatten") {
     return V1LayerParameter_LayerType_FLATTEN;
@@ -901,8 +901,8 @@ const char* UpgradeV1LayerType(const V1LayerParameter_LayerType type) {
     return "DummyData";
   case V1LayerParameter_LayerType_EUCLIDEAN_LOSS:
     return "EuclideanLoss";
-  case V1LayerParameter_LayerType_CLARITY_LOSS:
-    return "ClarityLoss";
+  //case V1LayerParameter_LayerType_CLARITY_LOSS:
+  //  return "ClarityLoss";
   case V1LayerParameter_LayerType_ELTWISE:
     return "Eltwise";
   case V1LayerParameter_LayerType_EXP:

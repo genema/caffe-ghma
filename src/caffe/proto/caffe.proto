@@ -406,7 +406,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
   // ghma add
-  optional ClarityLossParameter clarity_loss_param = 147;
+  // optional ClarityLossParameter clarity_loss_param = 147;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1414,7 +1414,9 @@ message PReLUParameter {
 }
 
 //
+/*
 message ClarityLossParameter {
-  optional int32 epsilon = 0.001;
+  //optional int32 epsilon = 0.001;
 
 }
+*/

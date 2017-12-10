@@ -213,12 +213,14 @@ void Solver<Dtype>::Step(int iters) {
     // average the loss across iterations for smoothed reporting
     UpdateSmoothedLoss(loss, start_iter, average_loss);
     if (display) {
+      char log_info[128];
       float lapse = iteration_timer_.Seconds();
       float per_s = (iter_ - iterations_last_) / (lapse ? lapse : 1);
       LOG_IF(INFO, Caffe::root_solver()) << "Iteration " << iter_
           << " (" << per_s << " iter/s, " << lapse << "s/"
           << param_.display() << " iters), loss = " << smoothed_loss_;
-      system("echo Iteration %d Speed %.2f iter/s Loss %.5f\n",iter_, per_s, smoothed_loss_);
+      snprintf(log_info, 128, "echo Iteration %.0f Speed %.2f iter/s Loss %.5f\n",iter_, per_s, smoothed_loss_);
+      system(log_info);
       
       iteration_timer_.Start();
       iterations_last_ = iter_;
