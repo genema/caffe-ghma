@@ -24,9 +24,9 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       bottom[1]->gpu_data(),
       diff_.mutable_gpu_data());
   //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-  Dtype *inputx = bottom[2]->gpu_data();
+  caffe_copy(bottom[2]->num(), bottom[2]->gpu_data(), x_.mutable_gpu_data());
   Dtype dot;
-  caffe_gpu_dot(count, diff_.gpu_data(), inputx, &dot);
+  caffe_gpu_dot(count, diff_.gpu_data(), x_.gpu_data(), &dot);
   Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_gpu_data()[0] = loss;
 }

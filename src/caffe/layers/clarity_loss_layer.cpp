@@ -2,7 +2,7 @@
 * @Author: gehuama
 * @Date:   2017-12-09 18:35:17
 * @Last Modified by:   gehuama
-* @Last Modified time: 2017-12-11 11:10:28
+* @Last Modified time: 2017-12-11 11:55:26
 */
 #include <vector>
 
@@ -32,8 +32,8 @@ void ClarityLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       bottom[1]->cpu_data(),
       diff_.mutable_cpu_data());
   //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-  Dtype *inputx                 = bottom[2]->cpu_data();
-  Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), inputx);
+  caffe_copy(bottom[2]->num(), bottom[2]->cpu_data(), x_.mutable_cpu_data());
+  Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), x_.cpu_data());
   Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
