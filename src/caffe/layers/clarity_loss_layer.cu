@@ -7,7 +7,9 @@
 
 #include <vector>
 
-#include "caffe/layers/clarity_loss_layer.hpp"
+#include "caffe/layer.hpp"
+#include "caffe/layers/loss_layer.hpp"
+#include "caffe/util/io.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
@@ -22,9 +24,9 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       bottom[1]->gpu_data(),
       diff_.mutable_gpu_data());
   //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-
-  Dtype inputx                  = *(bottom[2]->gpu_data());
-  Dtype dot                     = caffe_gpu_dot(count, diff_.gpu_data(), &inputx);
+  Dtype *inputx = bottom[2]->gpu_data();
+  Dtype dot;
+  caffe_gpu_dot(count, diff_.gpu_data(), inputx, &dot);
   Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_gpu_data()[0] = loss;
 }
@@ -39,7 +41,7 @@ void ClarityLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
       caffe_gpu_axpby(
           bottom[i]->count(),              // count
           alpha,                           // alpha
-          bottom[2],                          // a
+          bottom[2]->cpu_data(),                          // a
           Dtype(0),                        // beta
           bottom[i]->mutable_gpu_diff());  // b
     }

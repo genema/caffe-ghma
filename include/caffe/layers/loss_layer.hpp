@@ -47,19 +47,24 @@ class LossLayer : public Layer<Dtype> {
     return bottom_index != 1;
   }
 };
-/*
+
+
 template <typename Dtype>  
 class ClarityLossLayer : public LossLayer<Dtype> {  
  public:  
   explicit ClarityLossLayer(const LayerParameter& param)  
-      : LossLayer<Dtype>(param){}  
-  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,  
-      const vector<Blob<Dtype>*>& top);  
+      : LossLayer<Dtype>(param) {}  
+  virtual void Reshape(
+      const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
   
-  virtual inline int ExactNumBottomBlobs() const { return 3; }  
+  virtual inline int ExactNumBottomBlobs() const { return 3; }
+  virtual inline bool AutoTopBlobs() const { return true; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
   virtual inline const char* type() const { return "ClarityLoss"; }  
   virtual inline bool AllowForceBackward(const int bottom_index) const {  
     return bottom_index != 2;  
+
   }  
   
  protected:  
@@ -73,8 +78,9 @@ class ClarityLossLayer : public LossLayer<Dtype> {
   virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,  
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);  
  
+  Blob<Dtype> diff_;
 };  
-*/
+
 }  // namespace caffe
 
 #endif  // CAFFE_LOSS_LAYER_HPP_

@@ -2,11 +2,13 @@
 * @Author: gehuama
 * @Date:   2017-12-09 18:35:17
 * @Last Modified by:   gehuama
-* @Last Modified time: 2017-12-11 10:03:45
+* @Last Modified time: 2017-12-11 11:10:28
 */
 #include <vector>
 
-#include "caffe/layers/clarity_loss_layer.hpp"
+#include "caffe/layer.hpp"
+#include "caffe/layers/loss_layer.hpp"
+#include "caffe/util/io.hpp"
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
@@ -30,8 +32,8 @@ void ClarityLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       bottom[1]->cpu_data(),
       diff_.mutable_cpu_data());
   //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-  Dtype inputx                  = *(bottom[2]->cpu_data());
-  Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), &inputx);
+  Dtype *inputx                 = bottom[2]->cpu_data();
+  Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), inputx);
   Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
@@ -46,9 +48,9 @@ void ClarityLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       caffe_cpu_axpby(
           bottom[i]->count(),              // count
           alpha,                           // alpha
-          bottom[2],                          // a
+          bottom[2]->cpu_data(),                       // x
           Dtype(0),                        // beta
-          bottom[i]->mutable_cpu_diff());  // b
+          bottom[i]->mutable_cpu_diff());  // y
     }
   }
 }
