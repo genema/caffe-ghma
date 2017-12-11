@@ -2,7 +2,7 @@
 * @Author: gehuama
 * @Date:   2017-12-09 18:35:17
 * @Last Modified by:   gehuama
-* @Last Modified time: 2017-12-10 16:58:04
+* @Last Modified time: 2017-12-11 10:03:45
 */
 #include <vector>
 
@@ -30,8 +30,8 @@ void ClarityLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       bottom[1]->cpu_data(),
       diff_.mutable_cpu_data());
   //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-  Dtype inputx                  = bottom[2]->cpu_data();
-  Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), inputx);
+  Dtype inputx                  = *(bottom[2]->cpu_data());
+  Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), &inputx);
   Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
@@ -42,11 +42,11 @@ void ClarityLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   for (int i = 0; i < 2; ++i) {
     if (propagate_down[i]) {
       const Dtype sign = (i == 0) ? 1 : -1;
-      const Dtype alpha = sign * bottom[2]->cpu_data() / bottom[i]->num(); //(const Dtype*)diff_->cpu_data();
+      const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num(); //(const Dtype*)diff_->cpu_data();
       caffe_cpu_axpby(
           bottom[i]->count(),              // count
           alpha,                           // alpha
-          bottom,                // a
+          bottom[2],                          // a
           Dtype(0),                        // beta
           bottom[i]->mutable_cpu_diff());  // b
     }

@@ -17,7 +17,6 @@
 
 namespace caffe {
  
-
 /*
   for computing the modified clarity loss 
   E = 
@@ -33,16 +32,12 @@ class ClarityLossLayer : public LossLayer<Dtype> {
       const vector<Blob<Dtype>*>& top);
 
   virtual inline const char* type() const { return "ClarityLoss"; }
-  /**
-   * Unlike most loss layers, in the EuclideanLossLayer we can backpropagate
-   * to both inputs -- override to return true and always allow force_backward.
-   */
+
   virtual inline bool AllowForceBackward(const int bottom_index) const {
     return true;
   }
 
  protected:
-  /// @copydoc EuclideanLossLayer
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
@@ -58,4 +53,4 @@ class ClarityLossLayer : public LossLayer<Dtype> {
 
 }  // namespace caffe
 
-#endif  // CAFFE_EUCLIDEAN_LOSS_LAYER_HPP_
+#endif 

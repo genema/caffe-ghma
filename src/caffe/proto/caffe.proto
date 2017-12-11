@@ -308,7 +308,7 @@ message ParamSpec {
 // NOTE
 // Update the next available ID when you add a new LayerParameter field.
 //
-// LayerParameter next available layer-specific ID: 147 (last added: recurrent_param)
+// LayerParameter next available layer-specific ID: 148 (last added: recurrent_param)
 message LayerParameter {
   optional string name = 1; // the layer name
   optional string type = 2; // the layer type
@@ -406,7 +406,7 @@ message LayerParameter {
   optional TileParameter tile_param = 138;
   optional WindowDataParameter window_data_param = 129;
   // ghma add
-  // optional ClarityLossParameter clarity_loss_param = 147;
+  optional ClarityLossParameter clarity_loss_param = 147;
 }
 
 // Message that stores parameters used to apply transformation
@@ -1232,6 +1232,7 @@ message V1LayerParameter {
     CONCAT = 3;
     CONTRASTIVE_LOSS = 37;
     CONVOLUTION = 4;
+    CLARITY_LOSS = 147;
     DATA = 5;
     DECONVOLUTION = 39;
     DROPOUT = 6;
@@ -1414,9 +1415,8 @@ message PReLUParameter {
 }
 
 //
-/*
+
 message ClarityLossParameter {
-  //optional int32 epsilon = 0.001;
+  optional int32 epsilon = 1 [default = 1];
 
 }
-*/
