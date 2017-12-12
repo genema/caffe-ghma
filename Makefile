@@ -178,7 +178,8 @@ ifneq ($(CPU_ONLY), 1)
 	LIBRARIES := cudart cublas curand
 endif
 
-LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5
+LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_serial_hl hdf5_serial
+# for ubuntu 1604 cuda 8 :hdf5_serial_hl hdf5_serial
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
