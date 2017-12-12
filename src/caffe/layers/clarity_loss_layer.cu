@@ -15,6 +15,18 @@
 namespace caffe {
 
 template <typename Dtype>
+void ClarityLossLayer<Dtype>::Reshape(
+  const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+  LossLayer<Dtype>::Reshape(bottom, top);
+  CHECK_EQ(bottom[0]->count(1), bottom[1]->count(1))
+      << " CLARITY LOSS --> Inputs bottom[0] [1] must have the same dim.";
+  CHECK_EQ(bottom[0]->count(1), bottom[2]->count(1))
+      << " CLARITY LOSS --> Inputs bottom[0] [2] must have the same dim.";
+  diff_.ReshapeLike(*bottom[0]);
+  x_.ReshaleLike(*bottom[0]);
+}
+
+template <typename Dtype>
 void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   int count = bottom[0]->count();
@@ -23,8 +35,7 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       bottom[0]->gpu_data(),
       bottom[1]->gpu_data(),
       diff_.mutable_gpu_data());
-  //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-  caffe_copy(bottom[2]->num(), bottom[2]->gpu_data(), x_.mutable_gpu_data());
+  caffe_copy(count, bottom[2]->gpu_data(), x_.mutable_gpu_data()); // num is the N in each batch
   Dtype dot;
   caffe_gpu_dot(count, diff_.gpu_data(), x_.gpu_data(), &dot);
   Dtype loss                    = dot / bottom[0]->num(); 
@@ -41,7 +52,7 @@ void ClarityLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
       caffe_gpu_axpby(
           bottom[i]->count(),              // count
           alpha,                           // alpha
-          bottom[2]->cpu_data(),                          // a
+          bottom[2]->gpu_data(),                          // a
           Dtype(0),                        // beta
           bottom[i]->mutable_gpu_diff());  // b
     }

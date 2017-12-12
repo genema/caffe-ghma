@@ -63,8 +63,7 @@ class ClarityLossLayer : public LossLayer<Dtype> {
 
   virtual inline const char* type() const { return "ClarityLoss"; }  
   virtual inline bool AllowForceBackward(const int bottom_index) const {  
-    return bottom_index != 2;  
-
+    return bottom_index != 1;
   }  
   
  protected:  

@@ -2,7 +2,7 @@
 * @Author: gehuama
 * @Date:   2017-12-09 18:35:17
 * @Last Modified by:   gehuama
-* @Last Modified time: 2017-12-11 11:55:26
+* @Last Modified time: 2017-12-12 11:50:39
 */
 #include <vector>
 
@@ -18,8 +18,11 @@ void ClarityLossLayer<Dtype>::Reshape(
   const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
   CHECK_EQ(bottom[0]->count(1), bottom[1]->count(1))
-      << " CLARITY LOSS --> Inputs must have the same dimension.";
+      << " CLARITY LOSS --> Inputs bottom[0] [1] must have the same dim.";
+  CHECK_EQ(bottom[0]->count(1), bottom[2]->count(1))
+      << " CLARITY LOSS --> Inputs bottom[0] [2] must have the same dim.";
   diff_.ReshapeLike(*bottom[0]);
+  x_.ReshapeLike(*bottom[0]);
 }
 
 template <typename Dtype>
@@ -31,8 +34,7 @@ void ClarityLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       bottom[0]->cpu_data(),
       bottom[1]->cpu_data(),
       diff_.mutable_cpu_data());
-  //Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), diff_.cpu_data());
-  caffe_copy(bottom[2]->num(), bottom[2]->cpu_data(), x_.mutable_cpu_data());
+  caffe_copy(count, bottom[2]->cpu_data(), x_.mutable_cpu_data());
   Dtype dot                     = caffe_cpu_dot(count, diff_.cpu_data(), x_.cpu_data());
   Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
@@ -48,7 +50,7 @@ void ClarityLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       caffe_cpu_axpby(
           bottom[i]->count(),              // count
           alpha,                           // alpha
-          bottom[2]->cpu_data(),                       // x
+          bottom[2]->cpu_data(),           // x
           Dtype(0),                        // beta
           bottom[i]->mutable_cpu_diff());  // y
     }
