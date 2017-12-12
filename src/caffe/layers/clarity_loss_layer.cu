@@ -30,7 +30,7 @@ template <typename Dtype>
 void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   int count = bottom[0]->count();
-  caffe_sub(
+  caffe_gpu_sub(
       count,
       bottom[0]->gpu_data(),
       bottom[1]->gpu_data(),
@@ -38,8 +38,8 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   caffe_copy(count, bottom[2]->gpu_data(), x_.mutable_gpu_data()); // num is the N in each batch
   Dtype dot;
   caffe_gpu_dot(count, diff_.gpu_data(), x_.gpu_data(), &dot);
-  Dtype loss                    = dot / bottom[0]->num(); 
-  top[0]->mutable_gpu_data()[0] = loss;
+  Dtype loss                    = Dtype(-1) * dot / bottom[0]->num(); 
+  top[0]->mutable_cpu_data()[0] = loss;
 }
 
 template <typename Dtype>
