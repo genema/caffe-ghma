@@ -219,9 +219,14 @@ void Solver<Dtype>::Step(int iters) {
       LOG_IF(INFO, Caffe::root_solver()) << "Iteration " << iter_
           << " (" << per_s << " iter/s, " << lapse << "s/"
           << param_.display() << " iters), loss = " << smoothed_loss_;
-      snprintf(log_info, 128, "echo Iteration %.0f Speed %.2f iter/s Loss %.5f\n",iter_, per_s, smoothed_loss_);
-      system(log_info);
-      
+      if (iter_ != 0) {
+        snprintf(log_info, 128, "echo Iteration %d Speed %.2f iter/s Loss %.3f\n",iter_, per_s, smoothed_loss_);
+        int log_flag = system(log_info);
+      }else{
+        snprintf(log_info, 128, "echo Iteration %d Speed %.2f iter/s Loss %.3f\n",iter_, 0.0, smoothed_loss_);
+        int log_flag = system(log_info);
+      }
+
       iteration_timer_.Start();
       iterations_last_ = iter_;
       const vector<Blob<Dtype>*>& result = net_->output_blobs();
