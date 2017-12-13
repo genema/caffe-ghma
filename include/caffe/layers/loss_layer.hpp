@@ -79,6 +79,7 @@ class ClarityLossLayer : public LossLayer<Dtype> {
  
   Blob<Dtype> diff_;
   Blob<Dtype> x_;
+  Blob<Dtype> x2_;
 };  
 
 }  // namespace caffe

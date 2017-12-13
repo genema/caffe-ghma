@@ -23,7 +23,8 @@ void ClarityLossLayer<Dtype>::Reshape(
   CHECK_EQ(bottom[0]->count(1), bottom[2]->count(1))
       << " CLARITY LOSS --> Inputs bottom[0] [2] must have the same dim.";
   diff_.ReshapeLike(*bottom[0]);
-  x_.ReshaleLike(*bottom[0]);
+  x_.ReshapeLike(*bottom[0]);
+  x2_.ReshapeLike(*bottom[0]);
 }
 
 template <typename Dtype>
@@ -37,30 +38,24 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       diff_.mutable_gpu_data());
   caffe_gpu_abs(
     count,
-    diff_.mutable_gpu_data(),
+    diff_.gpu_data(),
     diff_.mutable_gpu_data());
   caffe_copy(count, bottom[2]->gpu_data(), x_.mutable_gpu_data()); // num is the N in each batch
+  caffe_gpu_mul(count, x_.gpu_data(), x_.gpu_data(), x_.mutable_gpu_data());
+  caffe_gpu_add_scalar(count, Dtype(0.000001), x_.mutable_gpu_data());
+  caffe_gpu_sqrt(count, x_.gpu_data(), x_.mutable_gpu_data());
   Dtype dot;
   caffe_gpu_dot(count, diff_.gpu_data(), x_.gpu_data(), &dot);
-  Dtype loss                    = Dtype(0.1) * dot / bottom[0]->num(); 
+  Dtype loss                    = dot / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
 
 template <typename Dtype>
 void ClarityLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 2; ++i) {
+    printf(" propagate_down=%d, i=%d",propagate_down[i], i);
     if (propagate_down[i]) {
-      if (i == 2){
-        const Dtype sign = -1;
-        const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num();
-        caffe_gpu_axpby(
-          bottom[i]->count(),              // count
-          alpha,                           // alpha
-          diff_.gpu_data(),                // x
-          Dtype(0),                        // beta
-          bottom[i]->mutable_gpu_diff());  // y
-      }else{
         const Dtype sign = (i == 0) ? 1 : -1;
         const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num(); //(const Dtype*)diff_->cpu_data();
         caffe_gpu_axpby(
@@ -69,7 +64,6 @@ void ClarityLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
           bottom[2]->gpu_data(),           // x
           Dtype(0),                        // beta
           bottom[i]->mutable_gpu_diff());  // y
-      }
     }
   }
 }
