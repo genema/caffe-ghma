@@ -11,6 +11,7 @@
 #include "caffe/layers/loss_layer.hpp"
 #include "caffe/util/io.hpp"
 #include "caffe/util/math_functions.hpp"
+#include "math.h"
 
 namespace caffe {
 
@@ -36,17 +37,12 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       bottom[0]->gpu_data(),
       bottom[1]->gpu_data(),
       diff_.mutable_gpu_data());
-  caffe_gpu_abs(
-    count,
-    diff_.gpu_data(),
-    diff_.mutable_gpu_data());
-  caffe_copy(count, bottom[2]->gpu_data(), x_.mutable_gpu_data()); // num is the N in each batch
-  caffe_gpu_mul(count, x_.gpu_data(), x_.gpu_data(), x_.mutable_gpu_data());
-  caffe_gpu_add_scalar(count, Dtype(0.000001), x_.mutable_gpu_data());
-  caffe_gpu_sqrt(count, x_.gpu_data(), x_.mutable_gpu_data());
+  //caffe_copy(count, bottom[2]->gpu_data(), x_.mutable_gpu_data()); // num is the N in each batch
+  //caffe_gpu_sqrt(count, x_.gpu_data(), x_.mutable_gpu_data());
   Dtype dot;
-  caffe_gpu_dot(count, diff_.gpu_data(), x_.gpu_data(), &dot);
-  Dtype loss                    = dot / bottom[0]->num(); 
+  caffe_gpu_dot(count, diff_.gpu_data(), diff_.gpu_data(), &dot);
+  //caffe_gpu_add_scalar(count, Dtype(0.000001), x_.mutable_gpu_data());
+  Dtype loss = sqrt(dot^2+0.01^2) / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
 
@@ -57,11 +53,11 @@ void ClarityLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     //printf(" propagate_down=%d, i=%d",propagate_down[i], i);
     if (propagate_down[i]) {
         const Dtype sign = (i == 0) ? 1 : -1;
-        const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num(); //(const Dtype*)diff_->cpu_data();
+        const Dtype alpha = 1 / (sign * top[0]->cpu_diff()[0]) / bottom[i]->num(); //(const Dtype*)diff_->cpu_data();
         caffe_gpu_axpby(
           bottom[i]->count(),              // count
           alpha,                           // alpha
-          bottom[2]->gpu_data(),           // x
+          diff_.gpu_data(),           // x
           Dtype(0),                        // beta
           bottom[i]->mutable_gpu_diff());  // y
     }
