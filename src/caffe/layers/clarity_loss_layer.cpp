@@ -2,7 +2,7 @@
 * @Author: gehuama
 * @Date:   2017-12-09 18:35:17
 * @Last Modified by:   gehuama
-* @Last Modified time: 2017-12-16 15:34:26
+* @Last Modified time: 2017-12-16 15:53:29
 */
 #include <vector>
 
@@ -19,8 +19,6 @@ void ClarityLossLayer<Dtype>::Reshape(
   LossLayer<Dtype>::Reshape(bottom, top);
   CHECK_EQ(bottom[0]->count(1), bottom[1]->count(1))
       << " CLARITY LOSS --> Inputs bottom[0] [1] must have the same dim.";
-  CHECK_EQ(bottom[0]->count(1), bottom[2]->count(1))
-      << " CLARITY LOSS --> Inputs bottom[0] [2] must have the same dim.";
   diff_.ReshapeLike(*bottom[0]);
   x_.ReshapeLike(*bottom[0]);
 }
@@ -38,12 +36,8 @@ void ClarityLossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     count,
     diff_.cpu_data(),
     diff_.mutable_cpu_data());
-  //caffe_copy(count, bottom[2]->cpu_data(), x_.mutable_cpu_data()); // num is the N in each batch
-  //caffe_mul(count, x_.cpu_data(), x_.cpu_data(), x_.mutable_cpu_data());
-  //caffe_add_scalar(count, Dtype(0.000001), x_.mutable_cpu_data());
-  //caffe_sqrt(count, x_.cpu_data(), x_.mutable_cpu_data());
   Dtype dot = caffe_cpu_dot(count, diff_.cpu_data(), x_.cpu_data());
-  Dtype loss = sqrt(dot^2 + 0.01^2) / bottom[0]->num(); 
+  Dtype loss = sqrt(pow(dot, 2) + pow(0.01, 2)) / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
 

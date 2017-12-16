@@ -21,8 +21,6 @@ void ClarityLossLayer<Dtype>::Reshape(
   LossLayer<Dtype>::Reshape(bottom, top);
   CHECK_EQ(bottom[0]->count(1), bottom[1]->count(1))
       << " CLARITY LOSS --> Inputs bottom[0] [1] must have the same dim.";
-  CHECK_EQ(bottom[0]->count(1), bottom[2]->count(1))
-      << " CLARITY LOSS --> Inputs bottom[0] [2] must have the same dim.";
   diff_.ReshapeLike(*bottom[0]);
   x_.ReshapeLike(*bottom[0]);
   x2_.ReshapeLike(*bottom[0]);
@@ -37,12 +35,9 @@ void ClarityLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       bottom[0]->gpu_data(),
       bottom[1]->gpu_data(),
       diff_.mutable_gpu_data());
-  //caffe_copy(count, bottom[2]->gpu_data(), x_.mutable_gpu_data()); // num is the N in each batch
-  //caffe_gpu_sqrt(count, x_.gpu_data(), x_.mutable_gpu_data());
   Dtype dot;
   caffe_gpu_dot(count, diff_.gpu_data(), diff_.gpu_data(), &dot);
-  //caffe_gpu_add_scalar(count, Dtype(0.000001), x_.mutable_gpu_data());
-  Dtype loss = sqrt(dot^2+0.01^2) / bottom[0]->num(); 
+  Dtype loss = sqrt(pow(dot, 2) + pow(0.01, 2)) / bottom[0]->num(); 
   top[0]->mutable_cpu_data()[0] = loss;
 }
 
