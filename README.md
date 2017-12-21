@@ -5,11 +5,13 @@
 
 Caffe is a deep learning framework made with expression, speed, and modularity in mind.
 It is developed by Berkeley AI Research ([BAIR](http://bair.berkeley.edu))/The Berkeley Vision and Learning Center (BVLC) and community contributors.
-ghma modified 171110.
+
+This version add some loss function for particular tasks.
+
 
 ## Also some custom distributions,if you want to use DIGITS try NVIDIA caffe.
 
- - [Intel Caffe](https://github.com/BVLC/caffe/tree/intel) (Optimized for CPU and support for multi-node), in particular Xeon processors (HSW, BDW, SKX, Xeon Phi).
+- [Intel Caffe](https://github.com/BVLC/caffe/tree/intel) (Optimized for CPU and support for multi-node), in particular Xeon processors (HSW, BDW, SKX, Xeon Phi).
 - [OpenCL Caffe](https://github.com/BVLC/caffe/tree/opencl) e.g. for AMD or Intel devices.
 - [Windows Caffe](https://github.com/BVLC/caffe/tree/windows)
 
@@ -19,7 +21,7 @@ ghma modified 171110.
 Caffe is released under the [BSD 2-Clause license](https://github.com/BVLC/caffe/blob/master/LICENSE).
 The BAIR/BVLC reference models are released for unrestricted use.
 
-Please cite Caffe in your publications if it helps your research:
+## Please cite Caffe's original developers in your publications if it helps your research:
 
     @article{jia2014caffe,
       Author = {Jia, Yangqing and Shelhamer, Evan and Donahue, Jeff and Karayev, Sergey and Long, Jonathan and Girshick, Ross and Guadarrama, Sergio and Darrell, Trevor},
