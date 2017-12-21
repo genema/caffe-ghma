@@ -34,7 +34,7 @@ void L1normLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   Dtype sum;
   caffe_gpu_asum(count, diff_.gpu_data(), &sum);
   Dtype loss = sum / bottom[0]->num();// 1/2N * SSE(y, ygt)
-  top[0]->mutable_gpu_data()[0] = loss;
+  top[0]->mutable_cpu_data()[0] = loss;
 }
 
 template <typename Dtype>
@@ -44,7 +44,7 @@ void L1normLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     if (propagate_down[i]) {
       caffe_gpu_sign(
         bottom[i]->count(), 
-        bottom[i]->mutable_gpu_diff(), 
+        top[0]->cpu_diff(), 
         bottom[i]->mutable_gpu_diff());
     }
   }
